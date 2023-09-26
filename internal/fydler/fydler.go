@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	runtimedebug "runtime/debug"
 	"slices"
 	"strings"
 	"text/tabwriter"
@@ -112,6 +113,9 @@ func parseFlags(analyzers []*analysis.Analyzer) {
 		tw.Flush()
 		fmt.Fprintln(out, "")
 
+		fmt.Fprintln(out, "Version:", version())
+		fmt.Fprintln(out, "")
+
 		fmt.Fprintln(out, "Flags:")
 		flag.PrintDefaults()
 	}
@@ -215,4 +219,35 @@ func diagnosticContains(contains []string, diag *analysis.Diagnostic) bool {
 		}
 	}
 	return false
+}
+
+func version() string {
+	bi, ok := runtimedebug.ReadBuildInfo()
+	if !ok {
+		return "no build info"
+	}
+
+	var revision, modified string
+	for _, bs := range bi.Settings {
+		switch bs.Key {
+		case "vcs.revision":
+			revision = bs.Value
+		case "vcs.modified":
+			modified = bs.Value
+		}
+	}
+
+	if revision == "" {
+		return bi.Main.Version
+	}
+
+	switch modified {
+	case "true":
+		return fmt.Sprintln(bi.Main.Version, revision, "(modified)")
+	case "false":
+		return fmt.Sprintln(bi.Main.Version, revision)
+	default:
+		// This should never happen.
+		return fmt.Sprintln(bi.Main.Version, revision, modified)
+	}
 }
