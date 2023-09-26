@@ -1,7 +1,5 @@
 github.com/andrewkroh/go-ecs v0.0.0-20230916014552-bb661ed278a6 h1:UXS7ZhcyFa1q3/P9pmIbEFjFLYOyu7UwbrUnZvudLeo=
 github.com/andrewkroh/go-ecs v0.0.0-20230916014552-bb661ed278a6/go.mod h1:mDhN1WOZsbKaV+wECV+ioF0Lgg4KxMTplkPHTqsj2gQ=
-github.com/andrewkroh/go-examples/fydler v0.0.0-20230925220516-0e7b0a11cc5e h1:eN6KJXMLSdn0gVa91LuasECSPRDMkyQI9iXF0MyjHko=
-github.com/andrewkroh/go-examples/fydler v0.0.0-20230925220516-0e7b0a11cc5e/go.mod h1:y2yCMRf5/w6oLJMR9LKpzR3bp4O31uDmABZrumviuew=
 github.com/andrewkroh/go-fleetpkg v0.0.8 h1:vKmmGcMPeMIQ+/sS1DHU0jTcERZBpznaNmaq1JbkLME=
 github.com/andrewkroh/go-fleetpkg v0.0.8/go.mod h1:FCFWIeEw6pg5dNFtIQ3f7vNA7iqTtLbiKQUyzjh477s=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
@@ -15,8 +13,8 @@ github.com/mattn/go-isatty v0.0.17 h1:BTarxUcIeDqL27Mc+vyvdWYSL28zpIhv3RoTdsLMPn
 github.com/mattn/go-isatty v0.0.17/go.mod h1:kYGgaQfpe5nmfYZH+SKPsOc2e4SrIfOl2e/yFXSvRLM=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/stretchr/testify v1.8.3 h1:RP3t2pwF7cMEbC1dqtB6poj3niw/9gnV4Cjg5oW5gtY=
-github.com/stretchr/testify v1.8.3/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
+github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
+github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 golang.org/x/exp v0.0.0-20230905200255-921286631fa9 h1:GoHiUyI/Tp2nVkLI2mCxVkOjsbSXD66ic0XW0js0R9g=
 golang.org/x/exp v0.0.0-20230905200255-921286631fa9/go.mod h1:S2oDrQGGwySpoQPVqRShND87VCbxmc6bL1Yd2oYrm6k=
 golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=

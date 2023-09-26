@@ -4,10 +4,9 @@ go 1.21.1
 
 require (
 	github.com/andrewkroh/go-ecs v0.0.0-20230916014552-bb661ed278a6
-	github.com/andrewkroh/go-examples/fydler v0.0.0-20230925220516-0e7b0a11cc5e
 	github.com/andrewkroh/go-fleetpkg v0.0.8
 	github.com/fatih/color v1.15.0
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9
 	gopkg.in/yaml.v3 v3.0.1
 )
