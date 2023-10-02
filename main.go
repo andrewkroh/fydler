@@ -25,6 +25,7 @@ import (
 	"github.com/andrewkroh/fydler/internal/analysis/invalidattribute"
 	"github.com/andrewkroh/fydler/internal/analysis/missingtype"
 	"github.com/andrewkroh/fydler/internal/analysis/nesting"
+	"github.com/andrewkroh/fydler/internal/analysis/objectmapping"
 	"github.com/andrewkroh/fydler/internal/analysis/unknownattribute"
 	"github.com/andrewkroh/fydler/internal/analysis/useecs"
 	"github.com/andrewkroh/fydler/internal/fydler"
@@ -39,6 +40,7 @@ func main() {
 		invalidattribute.Analyzer,
 		missingtype.Analyzer,
 		nesting.Analyzer,
+		objectmapping.Analyzer,
 		unknownattribute.Analyzer,
 		useecs.Analyzer,
 	)
