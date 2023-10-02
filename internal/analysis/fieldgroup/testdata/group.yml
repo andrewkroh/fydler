@@ -1,0 +1,12 @@
+---
+- name: foo
+  type: object
+  fields:
+    - name: bar
+      type: keyword
+
+- name: nested
+  type: nested
+  fields:
+    - name: bar
+      type: keyword

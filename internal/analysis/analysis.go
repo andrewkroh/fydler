@@ -91,3 +91,17 @@ type RelatedInformation struct {
 }
 
 type Printer func(diags []Diagnostic, w io.Writer)
+
+// VisitAll can be used to iterate over non-flat fields. Use this when you
+// need to analyze attributes of non-leaf fields.
+func VisitAll(f *fleetpkg.Field, visit func(*fleetpkg.Field) error) error {
+	if err := visit(f); err != nil {
+		return err
+	}
+	for _, child := range f.Fields {
+		if err := VisitAll(&child, visit); err != nil {
+			return err
+		}
+	}
+	return nil
+}
