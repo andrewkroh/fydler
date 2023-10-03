@@ -26,6 +26,33 @@ import (
 	"github.com/goccy/go-yaml/token"
 )
 
+// DeleteNode deletes a node from a map.
+func DeleteNode(f *ast.File, p *yaml.Path) error {
+	n, err := p.FilterFile(f)
+	if err != nil {
+		return err
+	}
+
+	for _, d := range f.Docs {
+		m := ast.Parent(d, n)
+		if m == nil {
+			continue
+		}
+		switch p := ast.Parent(d, m).(type) {
+		case *ast.MappingNode:
+			for i, e := range p.Values {
+				if e == m {
+					p.Values = append(p.Values[:i], p.Values[i+1:]...)
+					break
+				}
+			}
+		default:
+			return fmt.Errorf("failed to get parent node: %w", err)
+		}
+	}
+	return nil
+}
+
 // SetString replaces the node at the specified path with a StringNode.
 func SetString(f *ast.File, p *yaml.Path, value string) error {
 	_, err := p.FilterFile(f)

@@ -47,7 +47,12 @@ type Pass struct {
 	// Field information.
 	Fields []*fleetpkg.Field // Fields from every file.
 	Flat   []*fleetpkg.Field // Flat view of all fields sorted by file and line number.
-	AST    map[string]*AST   // Map of file paths to the AST of that file.
+
+	// Map of file paths to the AST of that file. This is available when Fix is true.
+	// Analyzers may add, modify, and delete map attributes, but they should not
+	// add or remove entire field list entries (any operation that changes indices
+	// in YAML paths would break other analyzers).
+	AST map[string]*AST
 
 	// ResultOf provides the inputs to this analysis pass, which are
 	// the corresponding results of its prerequisite analyzers.
