@@ -23,12 +23,15 @@ import (
 	"io"
 	"strconv"
 
+	"github.com/goccy/go-yaml/ast"
+
 	"github.com/andrewkroh/go-fleetpkg"
 )
 
 type Analyzer struct {
 	Name        string
 	Description string
+	CanFix      bool
 	Requires    []*Analyzer
 
 	Flags flag.FlagSet
@@ -39,9 +42,12 @@ type Analyzer struct {
 type Pass struct {
 	Analyzer *Analyzer
 
+	Fix bool // Should the analyzer apply fixes to AST?
+
 	// Field information.
 	Fields []*fleetpkg.Field // Fields from every file.
 	Flat   []*fleetpkg.Field // Flat view of all fields sorted by file and line number.
+	AST    map[string]*AST   // Map of file paths to the AST of that file.
 
 	// ResultOf provides the inputs to this analysis pass, which are
 	// the corresponding results of its prerequisite analyzers.
@@ -88,6 +94,11 @@ type Diagnostic struct {
 type RelatedInformation struct {
 	Pos     Pos
 	Message string
+}
+
+type AST struct {
+	File     *ast.File
+	Modified bool // Modified tracks whether File has been modified.
 }
 
 type Printer func(diags []Diagnostic, w io.Writer)

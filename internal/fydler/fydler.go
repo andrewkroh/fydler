@@ -30,6 +30,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/goccy/go-yaml/parser"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
 	"github.com/andrewkroh/fydler/internal/printer"
@@ -38,6 +39,7 @@ import (
 var (
 	outputTypes      stringListFlag
 	diagnosticFilter stringListFlag
+	fixFindings      bool
 )
 
 //nolint:revive // This is a pseudo main function so allow exits.
@@ -96,10 +98,12 @@ func parseFlags(analyzers []*analysis.Analyzer) {
 		})
 	}
 
-	flag.Var(&outputTypes, "set-output", "Output type to use. Allowed types are color-text, text, "+
-		"and json. Defaults to color-text.")
+	flag.BoolVar(&fixFindings, "fix", false, "Run analyzers and write fixes to fields files. "+
+		"This will only execute the analyzers that support automatic fixing.")
 	flag.Var(&diagnosticFilter, "i", "Include only diagnostics with a path containing this value. "+
 		"If specified more than once, then diagnostics that match any value are included.")
+	flag.Var(&outputTypes, "set-output", "Output type to use. Allowed types are color-text, text, "+
+		"and json. Defaults to color-text.")
 
 	flag.Usage = func() {
 		out := flag.CommandLine.Output()
@@ -125,7 +129,11 @@ func parseFlags(analyzers []*analysis.Analyzer) {
 
 		tw := tabwriter.NewWriter(out, 0, 0, 1, ' ', 0)
 		for _, a := range analyzers {
-			fmt.Fprintf(tw, "  %s\t%s\n", a.Name, a.Description)
+			var autoFix string
+			if a.CanFix {
+				autoFix = "(fix)"
+			}
+			fmt.Fprintf(tw, "  %s\t%s\t%s\n", a.Name, a.Description, autoFix)
 		}
 		tw.Flush()
 		fmt.Fprintln(out, "")
@@ -155,6 +163,13 @@ func parseFlags(analyzers []*analysis.Analyzer) {
 func Run(analyzers []*analysis.Analyzer, files ...string) (results map[*analysis.Analyzer]any, diags []analysis.Diagnostic, err error) {
 	slices.Sort(files)
 
+	if fixFindings {
+		// Only run analyzers that can fix.
+		analyzers = slices.DeleteFunc(analyzers, func(a *analysis.Analyzer) bool {
+			return !a.CanFix
+		})
+	}
+
 	analyzers, err = dependencyOrder(analyzers)
 	if err != nil {
 		return nil, nil, err
@@ -181,8 +196,16 @@ func Run(analyzers []*analysis.Analyzer, files ...string) (results map[*analysis
 	}
 	results = map[*analysis.Analyzer]any{}
 
+	if fixFindings {
+		pass.AST, err = loadASTs(fields)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
 	for _, a := range analyzers {
 		pass.Analyzer = a
+		pass.Fix = fixFindings
 		pass.ResultOf = map[*analysis.Analyzer]any{}
 		for _, required := range a.Requires {
 			pass.ResultOf[required] = results[required]
@@ -195,7 +218,35 @@ func Run(analyzers []*analysis.Analyzer, files ...string) (results map[*analysis
 		results[a] = result
 	}
 
+	if fixFindings {
+		for path, ast := range pass.AST {
+			if !ast.Modified {
+				continue
+			}
+			if err = os.WriteFile(path, []byte(ast.File.String()), 0o644); err != nil {
+				return nil, nil, err
+			}
+		}
+	}
+
 	return results, diags, nil
+}
+
+func loadASTs(fields []fleetpkg.Field) (map[string]*analysis.AST, error) {
+	m := map[string]*analysis.AST{}
+	for _, field := range fields {
+		if _, found := m[field.Path()]; found {
+			continue
+		}
+
+		f, err := parser.ParseFile(field.Path(), parser.ParseComments)
+		if err != nil {
+			return nil, fmt.Errorf("failed loading AST for %s: %w", field.Path(), err)
+		}
+
+		m[field.Path()] = &analysis.AST{File: f}
+	}
+	return m, nil
 }
 
 func compareFieldByFileMetadata(a, b fleetpkg.Field) int {
