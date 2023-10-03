@@ -53,6 +53,9 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		}
 
 		// It is invalid to specify a 'type' when an external definition is used.
+		// Probably most other attributes should be disallowed on 'external: ecs' fields,
+		// but I need to check if there is any merging of attributes or valid use-cases
+		// to allow this.
 		if f.Type != "" && f.External != "" {
 			var fixed bool
 			if pass.Fix {
