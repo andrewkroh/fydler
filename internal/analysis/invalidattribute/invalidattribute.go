@@ -18,14 +18,9 @@
 package invalidattribute
 
 import (
-	"errors"
 	"fmt"
 
-	"github.com/andrewkroh/go-fleetpkg"
-	"github.com/goccy/go-yaml"
-
 	"github.com/andrewkroh/fydler/internal/analysis"
-	"github.com/andrewkroh/fydler/internal/yamledit"
 )
 
 var Analyzer = &analysis.Analyzer{
@@ -42,7 +37,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			var fixed bool
 			if pass.Fix {
 				var err error
-				fixed, err = deleteKey(f, "description", pass)
+				fixed, err = analysis.DeleteKey(f, "description", pass)
 				if err != nil {
 					return nil, err
 				}
@@ -62,7 +57,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			var fixed bool
 			if pass.Fix {
 				var err error
-				fixed, err = deleteKey(f, "type", pass)
+				fixed, err = analysis.DeleteKey(f, "type", pass)
 				if err != nil {
 					return nil, err
 				}
@@ -78,23 +73,4 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		}
 	}
 	return nil, nil
-}
-
-func deleteKey(field *fleetpkg.Field, key string, pass *analysis.Pass) (fixed bool, err error) {
-	p, err := yaml.PathString(field.YAMLPath + "." + key)
-	if err != nil {
-		return false, err
-	}
-
-	ast := pass.AST[field.Path()]
-
-	if err := yamledit.DeleteNode(ast.File, p); err != nil {
-		if !errors.Is(err, yaml.ErrNotFoundNode) {
-			return true, nil
-		}
-		return false, err
-	}
-
-	ast.Modified = true
-	return true, nil
 }

@@ -18,14 +18,14 @@
 package unknownattribute
 
 import (
-	"errors"
 	"fmt"
+	"slices"
+
+	"golang.org/x/exp/maps"
 
 	"github.com/andrewkroh/go-fleetpkg"
-	"github.com/goccy/go-yaml"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
-	"github.com/andrewkroh/fydler/internal/yamledit"
 )
 
 var Analyzer = &analysis.Analyzer{
@@ -37,9 +37,13 @@ var Analyzer = &analysis.Analyzer{
 
 func run(pass *analysis.Pass) (interface{}, error) {
 	for _, f := range pass.Fields {
-		for attrName := range f.AdditionalAttributes {
+		// Determinism
+		attrs := maps.Keys(f.AdditionalAttributes)
+		slices.Sort(attrs)
+
+		for _, attrName := range attrs {
 			if pass.Fix {
-				fixed, err := fixUnknownAttribute(f, attrName, pass)
+				fixed, err := deleteUnknownAttribute(f, attrName, pass)
 				if err != nil {
 					return nil, err
 				}
@@ -71,27 +75,13 @@ var safeToRemove = map[string]bool{
 	"title":         true,
 }
 
-// fixUnknownAttribute removes attributes that are known to be useless. It must
-// leave all other attributes in place because they may be typos of valid attributes.
-func fixUnknownAttribute(field *fleetpkg.Field, attr string, pass *analysis.Pass) (fixed bool, err error) {
+// deleteUnknownAttribute removes the attribute if it is an attribute that is
+// known to be unused. It must leave all other attributes in place because they
+// may be typos of valid attributes.
+func deleteUnknownAttribute(field *fleetpkg.Field, attr string, pass *analysis.Pass) (fixed bool, err error) {
 	if _, safe := safeToRemove[attr]; !safe {
 		return false, nil
 	}
 
-	p, err := yaml.PathString(field.YAMLPath + "." + attr)
-	if err != nil {
-		return false, err
-	}
-
-	ast := pass.AST[field.Path()]
-
-	if err := yamledit.DeleteNode(ast.File, p); err != nil {
-		if !errors.Is(err, yaml.ErrNotFoundNode) {
-			return true, nil
-		}
-		return false, err
-	}
-
-	ast.Modified = true
-	return true, nil
+	return analysis.DeleteKey(field, attr, pass)
 }

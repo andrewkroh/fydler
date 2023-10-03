@@ -52,7 +52,7 @@ func Test(t *testing.T) {
 						Col:  int(3),
 					},
 					Category: string("unknownattribute"),
-					Message:  string("cloud contains an unknown attribute \"title\""),
+					Message:  string("cloud contains an unknown attribute \"footnote\""),
 					Related:  []analysis.RelatedInformation(nil),
 				},
 				{
@@ -72,7 +72,7 @@ func Test(t *testing.T) {
 						Col:  int(3),
 					},
 					Category: string("unknownattribute"),
-					Message:  string("cloud contains an unknown attribute \"footnote\""),
+					Message:  string("cloud contains an unknown attribute \"title\""),
 					Related:  []analysis.RelatedInformation(nil),
 				},
 			},

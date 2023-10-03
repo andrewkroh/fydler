@@ -19,13 +19,16 @@ package analysis
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"io"
 	"strconv"
 
+	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/goccy/go-yaml"
 	"github.com/goccy/go-yaml/ast"
 
-	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/andrewkroh/fydler/internal/yamledit"
 )
 
 type Analyzer struct {
@@ -129,4 +132,25 @@ func visitField(f *fleetpkg.Field, v func(*fleetpkg.Field) error) error {
 		}
 	}
 	return nil
+}
+
+// DeleteKey deletes the specified key from the AST associated with the given field.
+// This should only be used when pass.Fix is true.
+func DeleteKey(field *fleetpkg.Field, key string, pass *Pass) (modified bool, err error) {
+	p, err := yaml.PathString(field.YAMLPath + "." + key)
+	if err != nil {
+		return false, err
+	}
+
+	ast := pass.AST[field.Path()]
+
+	if err := yamledit.DeleteNode(ast.File, p); err != nil {
+		if !errors.Is(err, yaml.ErrNotFoundNode) {
+			return true, nil
+		}
+		return false, err
+	}
+
+	ast.Modified = true
+	return true, nil
 }
