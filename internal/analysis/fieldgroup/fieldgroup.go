@@ -24,13 +24,16 @@ import (
 	"fmt"
 
 	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/goccy/go-yaml"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
+	"github.com/andrewkroh/fydler/internal/yamledit"
 )
 
 var Analyzer = &analysis.Analyzer{
 	Name:        "fieldgroup",
 	Description: "Detect fields groups with incorrect type.",
+	CanFix:      true,
 	Run:         run,
 }
 
@@ -43,6 +46,16 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		}
 
 		if len(f.Fields) > 0 {
+			if pass.Fix {
+				fixed, err := fixGroupType(f, pass)
+				if err != nil {
+					return err
+				}
+				if fixed {
+					return nil
+				}
+			}
+
 			pass.Report(analysis.Diagnostic{
 				Pos:      analysis.NewPos(f.FileMetadata),
 				Category: pass.Analyzer.Name,
@@ -51,4 +64,22 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		}
 		return nil
 	})
+}
+
+// fixGroupType sets 'type: group' on the field.
+func fixGroupType(field *fleetpkg.Field, pass *analysis.Pass) (fixed bool, err error) {
+	ast := pass.AST[field.Path()]
+
+	p, err := yaml.PathString(field.YAMLPath + ".type")
+	if err != nil {
+		return false, err
+	}
+
+	err = yamledit.SetString(ast.File, p, "group")
+	if err != nil {
+		return false, err
+	}
+
+	ast.Modified = true
+	return true, nil
 }
