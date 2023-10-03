@@ -35,26 +35,20 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	for _, f := range pass.Fields {
-		err := analysis.VisitAll(f, func(f *fleetpkg.Field) error {
-			// Only `type: group` and `type: nested` are allowed to have non-empty 'fields'.
-			switch f.Type {
-			case "group", "nested", "":
-				return nil
-			}
-
-			if len(f.Fields) > 0 {
-				pass.Report(analysis.Diagnostic{
-					Pos:      analysis.NewPos(f.FileMetadata),
-					Category: pass.Analyzer.Name,
-					Message:  fmt.Sprintf("%s contains 'fields' and must be declared as 'type: group'", f.Name),
-				})
-			}
+	return nil, analysis.VisitFields(pass.Fields, func(f *fleetpkg.Field) error {
+		// Only `type: group` and `type: nested` are allowed to have non-empty 'fields'.
+		switch f.Type {
+		case "group", "nested", "":
 			return nil
-		})
-		if err != nil {
-			return nil, err
 		}
-	}
-	return nil, nil
+
+		if len(f.Fields) > 0 {
+			pass.Report(analysis.Diagnostic{
+				Pos:      analysis.NewPos(f.FileMetadata),
+				Category: pass.Analyzer.Name,
+				Message:  fmt.Sprintf("%s contains 'fields' and must be declared as 'type: group'", f.Name),
+			})
+		}
+		return nil
+	})
 }

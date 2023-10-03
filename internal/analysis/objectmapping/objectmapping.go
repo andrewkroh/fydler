@@ -36,42 +36,36 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	for _, f := range pass.Fields {
-		// This cannot be implemented using pass.Flat because we need to use
-		// f.Fields to filter invalid usages of 'type: object' on things that
-		// should have been 'type: group'. This avoids several false positives.
-		err := analysis.VisitAll(f, func(f *fleetpkg.Field) error {
-			if f.Type != "object" {
-				return nil
-			}
-
-			// Only look at leaf fields.
-			if len(f.Fields) > 0 {
-				return nil
-			}
-
-			// Wildcard fields create dynamic_templates which are more precise mappings.
-			if strings.Contains(f.Name, "*") {
-				return nil
-			}
-
-			// Using 'type: object` and `object_type` creates a dynamic_templates entry
-			// with 'path_match: {name}+".*"'.
-			if f.ObjectType != "" {
-				return nil
-			}
-
-			pass.Report(analysis.Diagnostic{
-				Pos:      analysis.NewPos(f.FileMetadata),
-				Category: pass.Analyzer.Name,
-				Message:  fmt.Sprintf("%s uses an imprecise mapping, add specific mappings for subfields", f.Name),
-			})
-
+	// This cannot be implemented using pass.Flat because we need to use
+	// f.Fields to filter invalid usages of 'type: object' on things that
+	// should have been 'type: group'. This avoids several false positives.
+	return nil, analysis.VisitFields(pass.Fields, func(f *fleetpkg.Field) error {
+		if f.Type != "object" {
 			return nil
-		})
-		if err != nil {
-			return nil, err
 		}
-	}
-	return nil, nil
+
+		// Only look at leaf fields.
+		if len(f.Fields) > 0 {
+			return nil
+		}
+
+		// Wildcard fields create dynamic_templates which are more precise mappings.
+		if strings.Contains(f.Name, "*") {
+			return nil
+		}
+
+		// Using 'type: object` and `object_type` creates a dynamic_templates entry
+		// with 'path_match: {name}+".*"'.
+		if f.ObjectType != "" {
+			return nil
+		}
+
+		pass.Report(analysis.Diagnostic{
+			Pos:      analysis.NewPos(f.FileMetadata),
+			Category: pass.Analyzer.Name,
+			Message:  fmt.Sprintf("%s uses an imprecise mapping, add specific mappings for subfields", f.Name),
+		})
+
+		return nil
+	})
 }
