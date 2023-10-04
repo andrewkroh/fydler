@@ -43,18 +43,12 @@ func Test(t *testing.T) {
 				},
 			},
 		},
-		{
-			Path:                  "testdata/fields.yml",
-			IgnoreConstantKeyword: true,
-		},
 	}
 
 	for _, tc := range testCases {
 		tc := tc
 
 		t.Run(filepath.Base(tc.Path), func(t *testing.T) {
-			ignoreConstantKeyword = tc.IgnoreConstantKeyword
-
 			_, diags, err := fydler.Run([]*analysis.Analyzer{Analyzer}, tc.Path)
 			if err != nil {
 				t.Fatal(err)
