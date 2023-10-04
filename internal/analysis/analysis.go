@@ -135,8 +135,12 @@ func visitField(f *fleetpkg.Field, v func(*fleetpkg.Field) error) error {
 }
 
 // DeleteKey deletes the specified key from the AST associated with the given field.
-// This should only be used when pass.Fix is true.
+// If pass.Fix is false, then this is a no-op.
 func DeleteKey(field *fleetpkg.Field, key string, pass *Pass) (modified bool, err error) {
+	if !pass.Fix {
+		return false, nil
+	}
+
 	p, err := yaml.PathString(field.YAMLPath + "." + key)
 	if err != nil {
 		return false, err

@@ -42,14 +42,12 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		slices.Sort(attrs)
 
 		for _, attrName := range attrs {
-			if pass.Fix {
-				fixed, err := deleteUnknownAttribute(f, attrName, pass)
-				if err != nil {
-					return nil, err
-				}
-				if fixed {
-					continue
-				}
+			fixed, err := deleteUnknownAttribute(f, attrName, pass)
+			if err != nil {
+				return nil, err
+			}
+			if fixed {
+				continue
 			}
 
 			pass.Report(analysis.Diagnostic{

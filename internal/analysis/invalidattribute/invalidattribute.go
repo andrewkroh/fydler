@@ -34,13 +34,9 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	for _, f := range pass.Fields {
 		// 'description' on field groups is never used by anything in Fleet.
 		if f.Type == "group" && f.Description != "" {
-			var fixed bool
-			if pass.Fix {
-				var err error
-				fixed, err = analysis.DeleteKey(f, "description", pass)
-				if err != nil {
-					return nil, err
-				}
+			fixed, err := analysis.DeleteKey(f, "description", pass)
+			if err != nil {
+				return nil, err
 			}
 
 			if !fixed {
@@ -52,18 +48,12 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			}
 		}
 
-		// It is invalid to specify a 'type' when an external definition is used.
-		// Probably most other attributes should be disallowed on 'external: ecs' fields,
-		// but I need to check if there is any merging of attributes or valid use-cases
-		// to allow this.
-		if f.Type != "" && f.External != "" {
-			var fixed bool
-			if pass.Fix {
-				var err error
-				fixed, err = analysis.DeleteKey(f, "type", pass)
-				if err != nil {
-					return nil, err
-				}
+		// It is invalid to specify a 'type' when an external definition is used
+		// (except for constant_keyword).
+		if len(f.External) > 0 && f.Type != "" && f.Type != "constant_keyword" {
+			fixed, err := analysis.DeleteKey(f, "type", pass)
+			if err != nil {
+				return nil, err
 			}
 
 			if !fixed {
