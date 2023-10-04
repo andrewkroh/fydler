@@ -37,12 +37,6 @@ var Analyzer = &analysis.Analyzer{
 	Run:         run,
 }
 
-var ignoreConstantKeyword bool
-
-func init() {
-	Analyzer.Flags.BoolVar(&ignoreConstantKeyword, "ignore-constant-keyword", false, "Ignore field definitions where ECS declares the type as 'keyword', but the definition uses the more optimized 'constant_keyword' type.")
-}
-
 func run(pass *analysis.Pass) (interface{}, error) {
 	for _, f := range pass.Flat {
 		if f.External != "" {
@@ -58,23 +52,17 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			return nil, err
 		}
 
-		if ignoreConstantKeyword && ecsField.DataType == "keyword" && f.Type == "constant_keyword" {
+		fixed, err := fixWithExternalECS(f, ecsField, pass)
+		if err != nil {
+			return nil, err
+		}
+		if fixed {
 			continue
 		}
 
 		message := fmt.Sprintf("%s exists in ECS, but the definition is not using 'external: ecs'.", f.Name)
 		if f.Type != "" && ecsField.DataType != f.Type {
 			message += fmt.Sprintf(" The ECS type is %s, but this uses %s", ecsField.DataType, f.Type)
-		}
-
-		if pass.Fix {
-			fixed, err := fixWithExternalECS(f, ecsField, pass)
-			if err != nil {
-				return nil, err
-			}
-			if fixed {
-				continue
-			}
 		}
 
 		pass.Report(analysis.Diagnostic{
@@ -87,11 +75,20 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	return nil, nil
 }
 
-// fixWithExternalECS replaces field node with a new definition that includes the original
-// 'name' value and 'external: ecs'.
+// fixWithExternalECS replaces the field node with a new definition that uses
+// 'external: ecs'. It will retain certain attributes that override indexing
+// behavior of the field.
 func fixWithExternalECS(field *fleetpkg.Field, ecsField *ecs.Field, pass *analysis.Pass) (fixed bool, err error) {
+	if !pass.Fix {
+		return false, nil
+	}
+
+	// An ECS keyword may be replaced with a constant_keyword.
+	// Source: https://github.com/elastic/elastic-package/blob/cafa676c6ec7420e08023f9af98185b114879714/internal/fields/dependency_manager.go#L204
+	overrideWithConstantKeyword := ecsField.DataType == "keyword" && field.Type == "constant_keyword"
+
 	// The type must be the same in order to do the replacement safely.
-	if field.Type != ecsField.DataType || (field.Type == "constant_keyword" && field.Value != "") {
+	if field.Type != ecsField.DataType && !overrideWithConstantKeyword {
 		return false, nil
 	}
 
@@ -110,15 +107,33 @@ func fixWithExternalECS(field *fleetpkg.Field, ecsField *ecs.Field, pass *analys
 
 	// This operates on pass.Flat where the field name is not the original
 	// name from the YAML node. We need the original name to modify the YAML.
-	var origField fleetpkg.Field
-	if err = yaml.NodeToValue(n, &origField); err != nil {
+	var o fleetpkg.Field
+	if err = yaml.NodeToValue(n, &o); err != nil {
 		return false, fmt.Errorf("failed to read original node: %w", err)
 	}
 
-	replacement, err := yaml.ValueToNode(map[string]any{
-		"name":     origField.Name,
-		"external": "ecs",
-	})
+	newField := fleetpkg.Field{
+		Name:     o.Name,
+		External: "ecs",
+
+		// constant_keyword fields should retain their type.
+		Value: o.Value,
+
+		// Keep these attributes because they are needed for TSDS.
+		MetricType: o.MetricType,
+		Dimension:  o.Dimension,
+
+		// Keep special attributes that control indexing.
+		DocValues: o.DocValues,
+		Index:     o.Index,
+		CopyTo:    o.CopyTo,
+		Enabled:   o.Enabled,
+	}
+	if overrideWithConstantKeyword {
+		newField.Type = "constant_keyword"
+	}
+
+	replacement, err := yaml.ValueToNode(newField)
 	if err != nil {
 		return false, err
 	}
