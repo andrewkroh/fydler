@@ -28,6 +28,7 @@ import (
 	"slices"
 	"strings"
 	"text/tabwriter"
+	"unicode"
 
 	"github.com/andrewkroh/go-fleetpkg"
 	"github.com/goccy/go-yaml/parser"
@@ -37,6 +38,7 @@ import (
 )
 
 var (
+	analyzersFilter  stringListFlag
 	outputTypes      stringListFlag
 	diagnosticFilter stringListFlag
 	fixFindings      bool
@@ -98,6 +100,7 @@ func parseFlags(analyzers []*analysis.Analyzer) {
 		})
 	}
 
+	flag.Var(&analyzersFilter, "a", "Analyzers to run. By default all analyzers are included.")
 	flag.BoolVar(&fixFindings, "fix", false, "Run analyzers and write fixes to fields files. "+
 		"This will only execute the analyzers that support automatic fixing.")
 	flag.Var(&diagnosticFilter, "i", "Include only diagnostics with a path containing this value. "+
@@ -158,10 +161,24 @@ func parseFlags(analyzers []*analysis.Analyzer) {
 	if len(outputTypes) == 0 {
 		outputTypes = []string{"color-text"}
 	}
+
+	var tmp []string
+	for _, a := range analyzersFilter {
+		x := strings.FieldsFunc(a, func(r rune) bool {
+			return unicode.IsSpace(r) || unicode.IsPunct(r)
+		})
+		tmp = append(tmp, x...)
+	}
+	analyzersFilter = tmp
 }
 
 func Run(analyzers []*analysis.Analyzer, files ...string) (results map[*analysis.Analyzer]any, diags []analysis.Diagnostic, err error) {
 	slices.Sort(files)
+
+	// Honor the
+	if len(analyzersFilter) > 0 {
+		analyzers = filterAnalyzers(analyzers, analyzersFilter)
+	}
 
 	if fixFindings {
 		// Only run analyzers that can fix.
@@ -318,4 +335,17 @@ func version() string {
 		// This should never happen.
 		return fmt.Sprintln(bi.Main.Version, revision, modified)
 	}
+}
+
+// filterAnalyzers returns the intersection of two sets.
+func filterAnalyzers(analyzers []*analysis.Analyzer, selected []string) []*analysis.Analyzer {
+	// Worst case is O(n^2).
+	return slices.DeleteFunc(analyzers, func(a *analysis.Analyzer) bool {
+		for _, name := range selected {
+			if a.Name == name {
+				return false
+			}
+		}
+		return true
+	})
 }
