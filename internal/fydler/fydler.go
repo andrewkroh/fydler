@@ -154,7 +154,6 @@ func parseFlags(analyzers []*analysis.Analyzer) {
 		case "color-text", "text", "json":
 		default:
 			log.Printf("invalid output type %q", output)
-			flag.Usage()
 			os.Exit(1)
 		}
 	}
@@ -162,6 +161,7 @@ func parseFlags(analyzers []*analysis.Analyzer) {
 		outputTypes = []string{"color-text"}
 	}
 
+	// Split analyzer filters and validate the values.
 	var tmp []string
 	for _, a := range analyzersFilter {
 		x := strings.FieldsFunc(a, func(r rune) bool {
@@ -170,6 +170,16 @@ func parseFlags(analyzers []*analysis.Analyzer) {
 		tmp = append(tmp, x...)
 	}
 	analyzersFilter = tmp
+nextFilter:
+	for _, name := range analyzersFilter {
+		for _, a := range analyzers {
+			if a.Name == name {
+				continue nextFilter
+			}
+		}
+		log.Printf("invalid analyzer name %q", name)
+		os.Exit(1)
+	}
 }
 
 func Run(analyzers []*analysis.Analyzer, files ...string) (results map[*analysis.Analyzer]any, diags []analysis.Diagnostic, err error) {
