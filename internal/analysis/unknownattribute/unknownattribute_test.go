@@ -75,6 +75,16 @@ func Test(t *testing.T) {
 					Message:  string("cloud contains an unknown attribute \"title\""),
 					Related:  []analysis.RelatedInformation(nil),
 				},
+				{
+					Pos: analysis.Pos{
+						File: string("testdata/group.yml"),
+						Line: int(9),
+						Col:  int(7),
+					},
+					Category: string("unknownattribute"),
+					Message:  string("account.id contains an unknown attribute \"required\""),
+					Related:  []analysis.RelatedInformation(nil),
+				},
 			},
 		},
 	}

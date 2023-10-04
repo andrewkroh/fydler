@@ -36,7 +36,7 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	for _, f := range pass.Fields {
+	return nil, analysis.VisitFields(pass.Fields, func(f *fleetpkg.Field) error {
 		// Determinism
 		attrs := maps.Keys(f.AdditionalAttributes)
 		slices.Sort(attrs)
@@ -44,7 +44,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		for _, attrName := range attrs {
 			fixed, err := deleteUnknownAttribute(f, attrName, pass)
 			if err != nil {
-				return nil, err
+				return err
 			}
 			if fixed {
 				continue
@@ -56,8 +56,8 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				Message:  fmt.Sprintf("%s contains an unknown attribute %q", f.Name, attrName),
 			})
 		}
-	}
-	return nil, nil
+		return nil
+	})
 }
 
 // safeToRemove is a list of keys that are safe to remove. The fields
@@ -71,6 +71,7 @@ var safeToRemove = map[string]bool{
 	"level":         true,
 	"norms":         true,
 	"title":         true,
+	"required":      true,
 }
 
 // deleteUnknownAttribute removes the attribute if it is an attribute that is

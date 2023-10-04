@@ -8,3 +8,4 @@
   fields:
     - name: account.id
       external: ecs
+      required: false
