@@ -66,7 +66,6 @@ func run(pass *analysis.Pass) (interface{}, error) {
 var safeToRemove = map[string]bool{
 	"default_field": true,
 	"footnote":      true,
-	"format":        true,
 	"group":         true,
 	"level":         true,
 	"norms":         true,
