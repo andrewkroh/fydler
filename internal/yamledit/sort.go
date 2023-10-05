@@ -26,9 +26,10 @@ import (
 
 // FieldAttributeOrder is an ast.Visitor that sorts maps keys for field definitions.
 var FieldAttributeOrder = mapKeyOrder{
-	"name":        -5,
-	"type":        -4,
-	"external":    -3,
+	"name":        -6,
+	"type":        -5,
+	"external":    -4,
+	"value":       -3,
 	"description": -2,
 }
 
