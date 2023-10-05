@@ -128,6 +128,9 @@ func fixWithExternalECS(field *fleetpkg.Field, ecsField *ecs.Field, pass *analys
 		Index:     o.Index,
 		CopyTo:    o.CopyTo,
 		Enabled:   o.Enabled,
+
+		// Keep the unit type because ECS does not have this concept.
+		Unit: o.Unit,
 	}
 	if overrideWithConstantKeyword {
 		newField.Type = "constant_keyword"
