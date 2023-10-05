@@ -4,7 +4,7 @@ go 1.21.1
 
 require (
 	github.com/andrewkroh/go-ecs v0.0.0-20230916014552-bb661ed278a6
-	github.com/andrewkroh/go-fleetpkg v0.0.9
+	github.com/andrewkroh/go-fleetpkg v0.0.10-0.20231005012742-c69b799b8f8a
 	github.com/fatih/color v1.15.0
 	github.com/goccy/go-yaml v1.11.2
 	github.com/stretchr/testify v1.8.4
