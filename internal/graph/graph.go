@@ -22,10 +22,9 @@ package graph
 import (
 	"cmp"
 	"errors"
+	"maps"
 	"slices"
 	"strings"
-
-	"golang.org/x/exp/maps"
 )
 
 var errGraphIsCyclic = errors.New("graph has at least one cycle")
