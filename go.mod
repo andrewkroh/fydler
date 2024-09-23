@@ -4,7 +4,7 @@ go 1.23
 
 require (
 	github.com/andrewkroh/go-ecs v0.0.0-20240213025458-42459d0ef898
-	github.com/andrewkroh/go-fleetpkg v0.0.11
+	github.com/andrewkroh/go-fleetpkg v0.0.12
 	github.com/fatih/color v1.17.0
 	github.com/goccy/go-yaml v1.12.0
 	github.com/stretchr/testify v1.9.0
