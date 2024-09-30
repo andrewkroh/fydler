@@ -1,7 +1,7 @@
 github.com/andrewkroh/go-ecs v0.0.0-20240213025458-42459d0ef898 h1:JDpqBtfL7zjspj5Z+fK2edla8mJ69+FBP7/fCy4undo=
 github.com/andrewkroh/go-ecs v0.0.0-20240213025458-42459d0ef898/go.mod h1:mDhN1WOZsbKaV+wECV+ioF0Lgg4KxMTplkPHTqsj2gQ=
-github.com/andrewkroh/go-fleetpkg v0.0.12 h1:nOT/OBZ55yna0SJRalzLEsz2aOajRZT5LptiPkj7Jvo=
-github.com/andrewkroh/go-fleetpkg v0.0.12/go.mod h1:oJsZtFyWWZplxQrPYK/gVoNzJvJpbJAy3phC6QGwsto=
+github.com/andrewkroh/go-fleetpkg v0.0.13 h1:qfXXCcKvV/w9yL3NKex8MIgC+U1OholAcq3n/st2d+U=
+github.com/andrewkroh/go-fleetpkg v0.0.13/go.mod h1:oJsZtFyWWZplxQrPYK/gVoNzJvJpbJAy3phC6QGwsto=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fatih/color v1.17.0 h1:GlRw1BRJxkpqUCBKzKOw098ed57fEsKeNjpTe3cSjK4=
