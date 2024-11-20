@@ -1,5 +1,5 @@
-github.com/andrewkroh/go-ecs v0.0.0-20240213025458-42459d0ef898 h1:JDpqBtfL7zjspj5Z+fK2edla8mJ69+FBP7/fCy4undo=
-github.com/andrewkroh/go-ecs v0.0.0-20240213025458-42459d0ef898/go.mod h1:mDhN1WOZsbKaV+wECV+ioF0Lgg4KxMTplkPHTqsj2gQ=
+github.com/andrewkroh/go-ecs v0.0.0-20241119011725-7abe167abb1c h1:8D5cfmoNoIqGBVpmWKoeRuHw99pLeuy4G/Kf/Qvqga8=
+github.com/andrewkroh/go-ecs v0.0.0-20241119011725-7abe167abb1c/go.mod h1:yAqyNuh4x3wu7M65qiX67MHjFIkgoiMXCKiokv33S2E=
 github.com/andrewkroh/go-fleetpkg v0.0.13 h1:qfXXCcKvV/w9yL3NKex8MIgC+U1OholAcq3n/st2d+U=
 github.com/andrewkroh/go-fleetpkg v0.0.13/go.mod h1:oJsZtFyWWZplxQrPYK/gVoNzJvJpbJAy3phC6QGwsto=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
