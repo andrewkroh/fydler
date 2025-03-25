@@ -15,6 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Package useecs provides an analyzer that detects fields that exist in the
+// latest version of ECS, but are not using 'external: ecs'.
+// It can also fix the issue by replacing the field definition with a new one
+// that uses 'external: ecs'.
 package useecs
 
 import (

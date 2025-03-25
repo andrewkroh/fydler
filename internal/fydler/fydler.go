@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Package fydler provides the core functionality for the fydler tool.
+// It provides the logic for running analyzers based on the provided CLI flags.
 package fydler
 
 import (

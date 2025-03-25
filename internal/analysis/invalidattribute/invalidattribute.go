@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Package invalidattribute detects invalid usages of field attributes.
 package invalidattribute
 
 import (

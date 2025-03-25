@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Package dynamicfield provides an analyzer for detecting issues with
+// wildcard fields meant to be dynamic mappings.
 package dynamicfield
 
 import (

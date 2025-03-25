@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Package unknownattribute detects unknown field attributes in fields.yml files.
 package unknownattribute
 
 import (

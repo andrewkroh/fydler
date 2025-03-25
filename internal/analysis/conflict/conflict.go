@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Package conflict provides an analyzer that detects conflicting data types
+// across declarations of fields with the same name. It is used to ensure that
+// fields are not declared with different data types in different data streams.
 package conflict
 
 import (

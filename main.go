@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// The fydler command examines fields.yml files and reports issues that
+// it detects. It can automatically fix some issues, such as removing
+// duplicate field definitions.
 package main
 
 import (

@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Package ecsdefinitionfact provides a fact that gathers the external ECS
+// definition for fields. It uses the ECS version fact to determine the
+// version of ECS to use for the lookup.
 package ecsdefinitionfact
 
 import (
