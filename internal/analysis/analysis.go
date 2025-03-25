@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Package analysis provides a framework for analyzing and modifying
+// fields.yml files.
 package analysis
 
 import (

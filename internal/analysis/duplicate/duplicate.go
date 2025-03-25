@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Package duplicate detects duplicate field declarations within a directory.
 package duplicate
 
 import (

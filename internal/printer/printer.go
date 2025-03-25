@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Package printer provides functions to print diagnostics in different formats.
 package printer
 
 import (

@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Package nesting detects fields that are nested below a scalar type field.
 package nesting
 
 import (

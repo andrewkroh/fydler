@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Package ecsversionfact provides a fact that returns the ECS version
+// associated with a fields.yml file. The ECS version is determined
+// by looking for a build.yml file for the package containing the fields.
 package ecsversionfact
 
 import (
