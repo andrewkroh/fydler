@@ -32,14 +32,14 @@ import (
 	"golang.org/x/exp/maps"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
-	"github.com/andrewkroh/fydler/internal/analysis/ecsdefinitionfact"
+	"github.com/andrewkroh/fydler/internal/analysis/aliasfact"
 )
 
 var Analyzer = &analysis.Analyzer{
 	Name:        "conflict",
 	Description: "Detect conflicting field data types across declarations of fields with the same name.",
 	Run:         run,
-	Requires:    []*analysis.Analyzer{ecsdefinitionfact.Analyzer},
+	Requires:    []*analysis.Analyzer{aliasfact.Analyzer},
 }
 
 var (
@@ -99,10 +99,10 @@ func makeDiag(conflicts []*fleetpkg.Field, dataTypes []string) *analysis.Diagnos
 // nonExternalConflicts reports conflicts between non-externally defined fields with
 // the same name, but different data types.
 func nonExternalConflicts(pass *analysis.Pass) error {
-	ecsDefinitionFact := pass.ResultOf[ecsdefinitionfact.Analyzer].(*ecsdefinitionfact.Fact)
+	aliasFact := pass.ResultOf[aliasfact.Analyzer].(*aliasfact.Fact)
 
 	// Sort by name and type.
-	slices.SortStableFunc(ecsDefinitionFact.EnrichedFlat, compareFieldByNameAndType)
+	slices.SortStableFunc(aliasFact.ResolvedAliases, compareFieldByNameAndType)
 
 	var currentKey string
 	var fields []*fleetpkg.Field
@@ -123,7 +123,7 @@ func nonExternalConflicts(pass *analysis.Pass) error {
 		maps.Clear(dataTypes)
 	}
 
-	for _, f := range ecsDefinitionFact.EnrichedFlat {
+	for _, f := range aliasFact.ResolvedAliases {
 		// The field must have a type to be considered in conflict with another field.
 		if f.Type == "" {
 			continue
