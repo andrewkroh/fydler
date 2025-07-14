@@ -27,6 +27,7 @@ import (
 	"os"
 	"path/filepath"
 	runtimedebug "runtime/debug"
+	"runtime/pprof"
 	"slices"
 	"strings"
 	"text/tabwriter"
@@ -44,6 +45,7 @@ var (
 	outputTypes      stringListFlag
 	diagnosticFilter stringListFlag
 	fixFindings      bool
+	cpuprofile       string
 )
 
 //nolint:revive // This is a pseudo main function so allow exits.
@@ -55,6 +57,18 @@ func Main(analyzers ...*analysis.Analyzer) {
 	log.SetPrefix(progname + ": ")
 
 	parseFlags(analyzers)
+
+	if cpuprofile != "" {
+		f, err := os.Create(cpuprofile)
+		if err != nil {
+			log.Fatal("Failed to create CPU profile file: ", err)
+		}
+		defer f.Close()
+		if err = pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("Failed to start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
 
 	if len(flag.Args()) == 0 {
 		log.Fatal("Must pass a list of fields.yml files (e.g. **/fields/*.yml)")
@@ -109,6 +123,7 @@ func parseFlags(analyzers []*analysis.Analyzer) {
 		"If specified more than once, then diagnostics that match any value are included.")
 	flag.Var(&outputTypes, "set-output", "Output type to use. Allowed types are color-text, text, "+
 		"and json. Defaults to color-text.")
+	flag.StringVar(&cpuprofile, "cpuprofile", "", "Write cpu profile to this file")
 
 	flag.Usage = func() {
 		out := flag.CommandLine.Output()
