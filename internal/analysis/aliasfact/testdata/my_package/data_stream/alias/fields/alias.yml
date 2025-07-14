@@ -1,0 +1,6 @@
+---
+- name: body
+  type: alias
+  path: message
+- name: message
+  external: ecs
