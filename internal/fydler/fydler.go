@@ -96,6 +96,8 @@ func Main(analyzers ...*analysis.Analyzer) {
 			err = printer.Text(diags, os.Stdout)
 		case "json":
 			err = printer.JSON(diags, os.Stdout)
+		case "markdown":
+			err = printer.Markdown(diags, os.Stdout, analyzers, version())
 		default:
 			panic("invalid output type")
 		}
@@ -122,7 +124,7 @@ func parseFlags(analyzers []*analysis.Analyzer) {
 	flag.Var(&diagnosticFilter, "i", "Include only diagnostics with a path containing this value. "+
 		"If specified more than once, then diagnostics that match any value are included.")
 	flag.Var(&outputTypes, "set-output", "Output type to use. Allowed types are color-text, text, "+
-		"and json. Defaults to color-text.")
+		"markdown, and json. Defaults to color-text.")
 	flag.StringVar(&cpuprofile, "cpuprofile", "", "Write cpu profile to this file")
 
 	flag.Usage = func() {
@@ -168,7 +170,7 @@ func parseFlags(analyzers []*analysis.Analyzer) {
 
 	for _, output := range outputTypes {
 		switch output {
-		case "color-text", "text", "json":
+		case "color-text", "text", "markdown", "json":
 		default:
 			log.Printf("invalid output type %q", output)
 			os.Exit(1)
