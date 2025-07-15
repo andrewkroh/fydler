@@ -34,10 +34,11 @@ import (
 )
 
 var Analyzer = &analysis.Analyzer{
-	Name:        "aliasfact",
-	Description: "Gathers the field type of the target field of an alias.",
-	Run:         run,
-	Requires:    []*analysis.Analyzer{ecsdefinitionfact.Analyzer},
+	Name: "aliasfact",
+	Description: "Gathers the field type of the target field of an alias. " +
+		"It reports a diagnostic if the target field does not resolve to a static field.",
+	Run:      run,
+	Requires: []*analysis.Analyzer{ecsdefinitionfact.Analyzer},
 }
 
 type Fact struct {

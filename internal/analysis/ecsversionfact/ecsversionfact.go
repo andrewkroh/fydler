@@ -35,9 +35,10 @@ import (
 )
 
 var Analyzer = &analysis.Analyzer{
-	Name:        "ecsversionfact",
-	Description: "Gathers the ECS version associated with fields.",
-	Run:         run,
+	Name: "ecsversionfact",
+	Description: "Gathers the ECS version associated with fields. " +
+		"It reports a diagnostic if the ECS version has not been specified.",
+	Run: run,
 }
 
 type Fact struct {

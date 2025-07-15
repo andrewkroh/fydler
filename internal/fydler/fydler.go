@@ -97,7 +97,9 @@ func Main(analyzers ...*analysis.Analyzer) {
 		case "json":
 			err = printer.JSON(diags, os.Stdout)
 		case "markdown":
-			err = printer.Markdown(diags, os.Stdout, analyzers, version())
+			// Incorporate dependencies into the list.
+			a, _ := dependencyOrder(analyzers)
+			err = printer.Markdown(diags, os.Stdout, a, version())
 		default:
 			panic("invalid output type")
 		}

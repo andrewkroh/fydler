@@ -33,10 +33,12 @@ import (
 )
 
 var Analyzer = &analysis.Analyzer{
-	Name:        "ecsdefinitionfact",
-	Description: "Gathers the external ECS definition for fields.",
-	Run:         run,
-	Requires:    []*analysis.Analyzer{ecsversionfact.Analyzer},
+	Name: "ecsdefinitionfact",
+	Description: "Gathers the external ECS definition for fields. " +
+		"It reports a diagnostic if the field is not a leaf field in the " +
+		"version of ECS declared in the _dev/build/build.yml file.",
+	Run:      run,
+	Requires: []*analysis.Analyzer{ecsversionfact.Analyzer},
 }
 
 type Fact struct {
