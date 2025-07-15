@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/andrewkroh/go-ecs v0.0.0-20250619223214-200a8d95d5c0
-	github.com/andrewkroh/go-fleetpkg v0.0.15
+	github.com/andrewkroh/go-fleetpkg v0.0.17
 	github.com/fatih/color v1.18.0
 	github.com/goccy/go-yaml v1.18.0
 	github.com/stretchr/testify v1.10.0
