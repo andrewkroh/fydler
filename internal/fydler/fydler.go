@@ -204,7 +204,7 @@ nextFilter:
 func Run(analyzers []*analysis.Analyzer, files ...string) (results map[*analysis.Analyzer]any, diags []analysis.Diagnostic, err error) {
 	slices.Sort(files)
 
-	// Honor the
+	// Honor the analyzers filter.
 	if len(analyzersFilter) > 0 {
 		analyzers = filterAnalyzers(analyzers, analyzersFilter)
 	}
@@ -367,14 +367,17 @@ func version() string {
 }
 
 // filterAnalyzers returns the intersection of two sets.
+// It does not modify the analyzers slice.
 func filterAnalyzers(analyzers []*analysis.Analyzer, selected []string) []*analysis.Analyzer {
 	// Worst case is O(n^2).
-	return slices.DeleteFunc(analyzers, func(a *analysis.Analyzer) bool {
+	out := make([]*analysis.Analyzer, 0, len(selected))
+	for _, a := range analyzers {
 		for _, name := range selected {
 			if a.Name == name {
-				return false
+				out = append(out, a)
+				break
 			}
 		}
-		return true
-	})
+	}
+	return out
 }
