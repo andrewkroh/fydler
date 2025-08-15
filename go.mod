@@ -1,9 +1,9 @@
 module github.com/andrewkroh/fydler
 
-go 1.24.0
+go 1.25.0
 
 require (
-	github.com/andrewkroh/go-ecs v0.0.0-20250619223214-200a8d95d5c0
+	github.com/andrewkroh/go-ecs v0.0.0-20250814052942-46f7e821365f
 	github.com/andrewkroh/go-fleetpkg v0.0.17
 	github.com/fatih/color v1.18.0
 	github.com/goccy/go-yaml v1.18.0
