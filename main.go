@@ -24,6 +24,7 @@ import (
 	"github.com/andrewkroh/fydler/internal/analysis/conflict"
 	"github.com/andrewkroh/fydler/internal/analysis/duplicate"
 	"github.com/andrewkroh/fydler/internal/analysis/dynamicfield"
+	"github.com/andrewkroh/fydler/internal/analysis/ecsnamespace"
 	"github.com/andrewkroh/fydler/internal/analysis/fieldgroup"
 	"github.com/andrewkroh/fydler/internal/analysis/invalidattribute"
 	"github.com/andrewkroh/fydler/internal/analysis/missingtype"
@@ -39,6 +40,7 @@ func main() {
 		conflict.Analyzer,
 		duplicate.Analyzer,
 		dynamicfield.Analyzer,
+		ecsnamespace.Analyzer,
 		fieldgroup.Analyzer,
 		invalidattribute.Analyzer,
 		missingtype.Analyzer,
