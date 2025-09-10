@@ -1,0 +1,10 @@
+---
+- name: host.CustomField
+  type: keyword
+
+# This is a valid field because labels is defined as an object.
+# This just happens to validate because 'labels` is a root ECS field not
+# containing a dot. Any other nested 'type: object' fields will need special
+# handling within the analyzer.
+- name: labels.application
+  type: keyword
