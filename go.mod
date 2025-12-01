@@ -6,7 +6,7 @@ require (
 	github.com/andrewkroh/go-ecs v0.0.0-20251111160023-db6307838a95
 	github.com/andrewkroh/go-fleetpkg v0.20.0
 	github.com/fatih/color v1.18.0
-	github.com/goccy/go-yaml v1.18.0
+	github.com/goccy/go-yaml v1.19.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b
 	gopkg.in/yaml.v3 v3.0.1
