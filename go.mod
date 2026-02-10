@@ -1,6 +1,6 @@
 module github.com/andrewkroh/fydler
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/andrewkroh/go-ecs v0.0.0-20260204044457-2d67483e976a
