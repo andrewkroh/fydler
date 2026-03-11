@@ -23,7 +23,7 @@ package fieldgroup
 import (
 	"fmt"
 
-	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/andrewkroh/go-package-spec/pkgspec"
 	"github.com/goccy/go-yaml"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
@@ -38,7 +38,7 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	return nil, analysis.VisitFields(pass.Fields, func(f *fleetpkg.Field) error {
+	return nil, analysis.VisitFields(pass.Fields, func(f *pkgspec.Field) error {
 		// Only `type: group` and `type: nested` are allowed to have non-empty 'fields'.
 		switch f.Type {
 		case "group", "nested", "":
@@ -67,10 +67,10 @@ func run(pass *analysis.Pass) (interface{}, error) {
 }
 
 // fixGroupType sets 'type: group' on the field.
-func fixGroupType(field *fleetpkg.Field, pass *analysis.Pass) (fixed bool, err error) {
-	ast := pass.AST[field.Path()]
+func fixGroupType(field *pkgspec.Field, pass *analysis.Pass) (fixed bool, err error) {
+	ast := pass.AST[field.FilePath()]
 
-	p, err := yaml.PathString(field.YAMLPath + ".type")
+	p, err := yaml.PathString(analysis.YAMLPath(field) + ".type")
 	if err != nil {
 		return false, err
 	}

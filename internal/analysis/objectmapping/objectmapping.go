@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/andrewkroh/go-package-spec/pkgspec"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
 )
@@ -39,7 +39,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	// This cannot be implemented using pass.Flat because we need to use
 	// f.Fields to filter invalid usages of 'type: object' on things that
 	// should have been 'type: group'. This avoids several false positives.
-	return nil, analysis.VisitFields(pass.Fields, func(f *fleetpkg.Field) error {
+	return nil, analysis.VisitFields(pass.Fields, func(f *pkgspec.Field) error {
 		if f.Type != "object" {
 			return nil
 		}

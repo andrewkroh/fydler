@@ -24,7 +24,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/andrewkroh/go-package-spec/pkgspec"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
 	"github.com/andrewkroh/fydler/internal/analysis/ecsdefinitionfact"
@@ -41,7 +41,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	ecsDefinitionFact := pass.ResultOf[ecsdefinitionfact.Analyzer].(*ecsdefinitionfact.Fact)
 
 	// Build map of parent field name to child field.
-	parentChildRelations := map[string][]*fleetpkg.Field{}
+	parentChildRelations := map[string][]*pkgspec.Field{}
 	for _, f := range ecsDefinitionFact.EnrichedFlat {
 		if idx := strings.LastIndexByte(f.Name, '.'); idx != -1 {
 			parentName := f.Name[:idx]
@@ -71,11 +71,11 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	return nil, nil
 }
 
-func makeDiag(parent *fleetpkg.Field, children []*fleetpkg.Field) analysis.Diagnostic {
+func makeDiag(parent *pkgspec.Field, children []*pkgspec.Field) analysis.Diagnostic {
 	diag := analysis.Diagnostic{
 		Pos:      analysis.NewPos(parent.FileMetadata),
 		Category: "nesting",
-		Message:  fmt.Sprintf("%s is defined as a scalar type (%s), but sub-fields were found", parent.Name, parent.Type),
+		Message:  fmt.Sprintf("%s is defined as a scalar type (%s), but sub-fields were found", parent.Name, string(parent.Type)),
 		Related:  make([]analysis.RelatedInformation, 0, len(children)),
 	}
 
@@ -85,14 +85,14 @@ func makeDiag(parent *fleetpkg.Field, children []*fleetpkg.Field) analysis.Diagn
 	for _, f := range children {
 		diag.Related = append(diag.Related, analysis.RelatedInformation{
 			Pos:     analysis.NewPos(f.FileMetadata),
-			Message: f.Name + " is sub-field with type " + f.Type,
+			Message: f.Name + " is sub-field with type " + string(f.Type),
 		})
 	}
 	return diag
 }
 
-func compareFieldByFileMetadata(a, b *fleetpkg.Field) int {
-	if c := cmp.Compare(a.Path(), b.Path()); c != 0 {
+func compareFieldByFileMetadata(a, b *pkgspec.Field) int {
+	if c := cmp.Compare(a.FilePath(), b.FilePath()); c != 0 {
 		return c
 	}
 	if c := cmp.Compare(a.Line(), b.Line()); c != 0 {

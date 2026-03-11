@@ -74,7 +74,7 @@ func Test(t *testing.T) {
 			fact := results[Analyzer].(*Fact)
 			require.Len(t, fact.ResolvedAliases, len(tc.Fields), "unexpected ResolvedAliases length")
 			for _, f := range fact.ResolvedAliases {
-				assert.Equal(t, tc.Fields[f.Name], f.Type)
+				assert.Equal(t, tc.Fields[f.Name], string(f.Type))
 			}
 		})
 	}

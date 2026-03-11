@@ -28,7 +28,7 @@ import (
 	"strings"
 
 	"github.com/andrewkroh/go-ecs"
-	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/andrewkroh/go-package-spec/pkgspec"
 	"golang.org/x/exp/maps"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
@@ -69,7 +69,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	return nil, nil
 }
 
-func makeDiag(conflicts []*fleetpkg.Field, dataTypes []string) *analysis.Diagnostic {
+func makeDiag(conflicts []*pkgspec.Field, dataTypes []string) *analysis.Diagnostic {
 	if ignoreTextFamilyConflicts && isTextTypeFamilyConflict(dataTypes...) {
 		return nil
 	}
@@ -90,7 +90,7 @@ func makeDiag(conflicts []*fleetpkg.Field, dataTypes []string) *analysis.Diagnos
 	for _, f := range conflicts {
 		diag.Related = append(diag.Related, analysis.RelatedInformation{
 			Pos:     analysis.NewPos(f.FileMetadata),
-			Message: f.Type,
+			Message: string(f.Type),
 		})
 	}
 	return diag
@@ -105,12 +105,12 @@ func nonExternalConflicts(pass *analysis.Pass) error {
 	slices.SortStableFunc(aliasFact.ResolvedAliases, compareFieldByNameAndType)
 
 	var currentKey string
-	var fields []*fleetpkg.Field
+	var fields []*pkgspec.Field
 	dataTypes := map[string]struct{}{}
 	flush := func() {
 		// Aggregate types.
 		for _, f := range fields {
-			dataTypes[f.Type] = struct{}{}
+			dataTypes[string(f.Type)] = struct{}{}
 		}
 		if len(dataTypes) > 1 {
 			if diag := makeDiag(fields, maps.Keys(dataTypes)); diag != nil {
@@ -170,13 +170,13 @@ func externalECSConflicts(pass *analysis.Pass) error {
 			return err
 		}
 
-		if f.Type == ecsField.DataType {
+		if string(f.Type) == ecsField.DataType {
 			continue
 		}
-		if ignoreTextFamilyConflicts && isTextTypeFamilyConflict(f.Type, ecsField.DataType) {
+		if ignoreTextFamilyConflicts && isTextTypeFamilyConflict(string(f.Type), ecsField.DataType) {
 			continue
 		}
-		if ignoreKeywordFamilyConflicts && isKeywordTypeFamilyConflict(f.Type, ecsField.DataType) {
+		if ignoreKeywordFamilyConflicts && isKeywordTypeFamilyConflict(string(f.Type), ecsField.DataType) {
 			continue
 		}
 		pass.Report(analysis.Diagnostic{
@@ -211,7 +211,7 @@ func isKeywordTypeFamilyConflict(dataTypes ...string) bool {
 	return true
 }
 
-func compareFieldByNameAndType(a, b *fleetpkg.Field) int {
+func compareFieldByNameAndType(a, b *pkgspec.Field) int {
 	if c := cmp.Compare(a.Name, b.Name); c != 0 {
 		return c
 	}

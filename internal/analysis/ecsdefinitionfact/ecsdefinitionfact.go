@@ -26,7 +26,7 @@ import (
 	"path/filepath"
 
 	"github.com/andrewkroh/go-ecs"
-	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/andrewkroh/go-package-spec/pkgspec"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
 	"github.com/andrewkroh/fydler/internal/analysis/ecsversionfact"
@@ -42,14 +42,14 @@ var Analyzer = &analysis.Analyzer{
 }
 
 type Fact struct {
-	EnrichedFlat []*fleetpkg.Field // Field data enriched with external field data (type, description, pattern).
+	EnrichedFlat []*pkgspec.Field // Field data enriched with external field data (type, description, pattern).
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
 	// Only log a Diagnostic once per directory.
 	unknownECSVersion := map[string]struct{}{}
 	ecsVersionsFact := pass.ResultOf[ecsversionfact.Analyzer].(*ecsversionfact.Fact)
-	fact := &Fact{EnrichedFlat: make([]*fleetpkg.Field, 0, len(pass.Flat))}
+	fact := &Fact{EnrichedFlat: make([]*pkgspec.Field, 0, len(pass.Flat))}
 
 	for _, f := range pass.Flat {
 		if f.External != "ecs" {
@@ -60,9 +60,9 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		// If the ecsVersion is not found, then the ecs.Lookup() will use data
 		// from the latest ECS version. The ecsversionfact will have logged a
 		// diagnostic about that problem.
-		ecsVersion := ecsVersionsFact.ECSVersion(f.Path())
+		ecsVersion := ecsVersionsFact.ECSVersion(f.FilePath())
 
-		dir := filepath.Dir(f.Path())
+		dir := filepath.Dir(f.FilePath())
 		ecsField, err := ecs.Lookup(f.Name, ecsVersion)
 		if err != nil {
 			switch {
@@ -92,7 +92,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				}
 			default:
 				return nil, fmt.Errorf("failed looking up ECS definition of %q from %s:%d:%d using version %q: %w",
-					f.Name, f.Path(), f.Line(), f.Column(), ecsVersion, err)
+					f.Name, f.FilePath(), f.Line(), f.Column(), ecsVersion, err)
 			}
 
 			continue
@@ -103,7 +103,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			tmp := *f
 			f = &tmp
 		}
-		f.Type = ecsField.DataType
+		f.Type = pkgspec.FieldType(ecsField.DataType)
 		f.Pattern = ecsField.Pattern
 		f.Description = ecsField.Description
 
