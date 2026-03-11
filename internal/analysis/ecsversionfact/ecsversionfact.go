@@ -28,7 +28,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/andrewkroh/go-package-spec/pkgspec"
 	"gopkg.in/yaml.v3"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
@@ -59,7 +59,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			continue
 		}
 
-		dir := filepath.Dir(f.Path())
+		dir := filepath.Dir(f.FilePath())
 		if _, found := dirToECSVersion[dir]; found {
 			continue
 		}
@@ -105,7 +105,7 @@ func lookupECSReference(dir string) (string, error) {
 	}
 	defer f.Close()
 
-	var manifest fleetpkg.BuildManifest
+	var manifest pkgspec.BuildManifest
 	dec := yaml.NewDecoder(f)
 	if err = dec.Decode(&manifest); err != nil {
 		return "", fmt.Errorf("failed to unmarshal %s: %w", f.Name(), err)

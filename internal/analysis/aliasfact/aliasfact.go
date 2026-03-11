@@ -17,7 +17,7 @@
 
 // Package aliasfact provides a fact that resolves the type of alias target
 // fields. It uses the ECS definition fact to ensure that any external ECS
-// definitions are resolved. The fleetpkg.Field.Type is overwritten with the
+// definitions are resolved. The pkgspec.Field.Type is overwritten with the
 // type of the target field. A diagnostic is reported if the target field does
 // not exist in the same directory, and the unresolved alias field is included
 // in the fact.
@@ -27,7 +27,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/andrewkroh/go-package-spec/pkgspec"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
 	"github.com/andrewkroh/fydler/internal/analysis/ecsdefinitionfact"
@@ -42,29 +42,30 @@ var Analyzer = &analysis.Analyzer{
 }
 
 type Fact struct {
-	ResolvedAliases []*fleetpkg.Field // Field data where the type is overwritten with the type of the target field.
+	ResolvedAliases []*pkgspec.Field // Field data where the type is overwritten with the type of the target field.
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
 	ecsDefinitionFact := pass.ResultOf[ecsdefinitionfact.Analyzer].(*ecsdefinitionfact.Fact)
-	fact := &Fact{ResolvedAliases: make([]*fleetpkg.Field, 0, len(ecsDefinitionFact.EnrichedFlat))}
+	fact := &Fact{ResolvedAliases: make([]*pkgspec.Field, 0, len(ecsDefinitionFact.EnrichedFlat))}
 
 	for _, f := range ecsDefinitionFact.EnrichedFlat {
 		if f.Type != "alias" {
 			fact.ResolvedAliases = append(fact.ResolvedAliases, f)
 			continue
 		}
-		dir := filepath.Dir(f.Path())
+		dir := filepath.Dir(f.FilePath())
 
-		var resolvedType string
+		var resolvedType pkgspec.FieldType
 		for _, aliased := range ecsDefinitionFact.EnrichedFlat {
-			if f.AliasTargetPath == aliased.Name {
-				aliasedDir := filepath.Dir(aliased.Path())
+			if f.Path == aliased.Name {
+				aliasedDir := filepath.Dir(aliased.FilePath())
 				if dir != aliasedDir {
 					continue
 				}
 
 				resolvedType = aliased.Type
+
 				break
 			}
 		}
@@ -73,7 +74,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			pass.Report(analysis.Diagnostic{
 				Pos:      analysis.NewPos(f.FileMetadata),
 				Category: pass.Analyzer.Name,
-				Message:  fmt.Sprintf("%s is declared as an alias, but the aliased field %s does not exist in the same directory", f.Name, f.AliasTargetPath),
+				Message:  fmt.Sprintf("%s is declared as an alias, but the aliased field %s does not exist in the same directory", f.Name, f.Path),
 			})
 
 			// Put the unresolved alias into the list so that it can be considered by downstream analyzers.

@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/andrewkroh/go-package-spec/pkgspec"
 	"golang.org/x/exp/maps"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
@@ -35,7 +35,7 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func run(pass *analysis.Pass) (any, error) {
-	seen := map[string][]*fleetpkg.Field{}
+	seen := map[string][]*pkgspec.Field{}
 	var currentDir string
 
 	flush := func() {
@@ -63,7 +63,7 @@ func run(pass *analysis.Pass) (any, error) {
 	}
 	for _, f := range pass.Flat {
 		// When the directory changes flush the duplicates.
-		if dir := filepath.Dir(f.Path()); currentDir != dir {
+		if dir := filepath.Dir(f.FilePath()); currentDir != dir {
 			// Reset
 			flush()
 			maps.Clear(seen)

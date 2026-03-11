@@ -59,7 +59,7 @@ func Test(t *testing.T) {
 			fact := results[Analyzer].(*Fact)
 			require.Len(t, fact.EnrichedFlat, len(tc.Fields), "unexpected EnrichedFlat length")
 			for _, f := range fact.EnrichedFlat {
-				assert.Equal(t, tc.Fields[f.Name], f.Type)
+				assert.Equal(t, tc.Fields[f.Name], string(f.Type))
 			}
 		})
 	}

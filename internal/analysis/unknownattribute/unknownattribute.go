@@ -22,9 +22,8 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/andrewkroh/go-package-spec/pkgspec"
 	"golang.org/x/exp/maps"
-
-	"github.com/andrewkroh/go-fleetpkg"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
 )
@@ -37,9 +36,9 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	return nil, analysis.VisitFields(pass.Fields, func(f *fleetpkg.Field) error {
+	return nil, analysis.VisitFields(pass.Fields, func(f *pkgspec.Field) error {
 		// Determinism
-		attrs := maps.Keys(f.AdditionalAttributes)
+		attrs := maps.Keys(f.Extras)
 		slices.Sort(attrs)
 
 		for _, attrName := range attrs {
@@ -78,7 +77,7 @@ var safeToRemove = map[string]bool{
 // deleteUnknownAttribute removes the attribute if it is an attribute that is
 // known to be unused. It must leave all other attributes in place because they
 // may be typos of valid attributes.
-func deleteUnknownAttribute(field *fleetpkg.Field, attr string, pass *analysis.Pass) (fixed bool, err error) {
+func deleteUnknownAttribute(field *pkgspec.Field, attr string, pass *analysis.Pass) (fixed bool, err error) {
 	if _, safe := safeToRemove[attr]; !safe {
 		return false, nil
 	}

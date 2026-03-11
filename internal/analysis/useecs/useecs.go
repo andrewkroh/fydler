@@ -26,7 +26,7 @@ import (
 	"fmt"
 
 	"github.com/andrewkroh/go-ecs"
-	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/andrewkroh/go-package-spec/pkgspec"
 	"github.com/goccy/go-yaml"
 	yamlast "github.com/goccy/go-yaml/ast"
 
@@ -65,7 +65,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		}
 
 		message := fmt.Sprintf("%s exists in ECS, but the definition is not using 'external: ecs'.", f.Name)
-		if f.Type != "" && ecsField.DataType != f.Type {
+		if f.Type != "" && ecsField.DataType != string(f.Type) {
 			message += fmt.Sprintf(" The ECS type is %s, but this uses %s", ecsField.DataType, f.Type)
 		}
 
@@ -82,7 +82,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 // fixWithExternalECS replaces the field node with a new definition that uses
 // 'external: ecs'. It will retain certain attributes that override indexing
 // behavior of the field.
-func fixWithExternalECS(field *fleetpkg.Field, ecsField *ecs.Field, pass *analysis.Pass) (fixed bool, err error) {
+func fixWithExternalECS(field *pkgspec.Field, ecsField *ecs.Field, pass *analysis.Pass) (fixed bool, err error) {
 	if !pass.Fix {
 		return false, nil
 	}
@@ -92,31 +92,32 @@ func fixWithExternalECS(field *fleetpkg.Field, ecsField *ecs.Field, pass *analys
 	overrideWithConstantKeyword := ecsField.DataType == "keyword" && field.Type == "constant_keyword"
 
 	// The type must be the same in order to do the replacement safely.
-	if field.Type != ecsField.DataType && !overrideWithConstantKeyword {
+	if string(field.Type) != ecsField.DataType && !overrideWithConstantKeyword {
 		return false, nil
 	}
 
 	// Get the old node.
-	p, err := yaml.PathString(field.YAMLPath)
+	yamlPath := analysis.YAMLPath(field)
+	p, err := yaml.PathString(yamlPath)
 	if err != nil {
 		return false, err
 	}
 
-	ast := pass.AST[field.Path()]
+	ast := pass.AST[field.FilePath()]
 
 	n, err := p.FilterFile(ast.File)
 	if err != nil {
-		return false, fmt.Errorf("failed to get YAML node %q: %w", field.YAMLPath, err)
+		return false, fmt.Errorf("failed to get YAML node %q: %w", yamlPath, err)
 	}
 
 	// This operates on pass.Flat where the field name is not the original
 	// name from the YAML node. We need the original name to modify the YAML.
-	var o fleetpkg.Field
+	var o pkgspec.Field
 	if err = yaml.NodeToValue(n, &o); err != nil {
 		return false, fmt.Errorf("failed to read original node: %w", err)
 	}
 
-	newField := fleetpkg.Field{
+	newField := pkgspec.Field{
 		Name:     o.Name,
 		External: "ecs",
 

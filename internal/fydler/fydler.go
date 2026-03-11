@@ -33,8 +33,9 @@ import (
 	"text/tabwriter"
 	"unicode"
 
-	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/andrewkroh/go-package-spec/pkgspec"
 	"github.com/goccy/go-yaml/parser"
+	"gopkg.in/yaml.v3"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
 	"github.com/andrewkroh/fydler/internal/printer"
@@ -223,15 +224,16 @@ func Run(analyzers []*analysis.Analyzer, files ...string) (results map[*analysis
 		return nil, nil, err
 	}
 
-	fields, err := fleetpkg.ReadFields(files...)
+	fields, err := readFields(files...)
 	if err != nil {
 		return nil, nil, err
 	}
 	slices.SortFunc(fields, compareFieldByFileMetadata)
 
-	flat, err := fleetpkg.FlattenFields(fields)
-	if err != nil {
-		return nil, nil, err
+	flatFields := pkgspec.FlattenFields(fields, nil)
+	flat := make([]pkgspec.Field, len(flatFields))
+	for i := range flatFields {
+		flat[i] = flatFields[i].Field
 	}
 	slices.SortFunc(flat, compareFieldByFileMetadata)
 
@@ -280,35 +282,73 @@ func Run(analyzers []*analysis.Analyzer, files ...string) (results map[*analysis
 	return results, diags, nil
 }
 
-func loadASTs(fields []fleetpkg.Field) (map[string]*analysis.AST, error) {
+func loadASTs(fields []pkgspec.Field) (map[string]*analysis.AST, error) {
 	m := map[string]*analysis.AST{}
 	for _, field := range fields {
-		if _, found := m[field.Path()]; found {
+		if _, found := m[field.FilePath()]; found {
 			continue
 		}
 
-		f, err := parser.ParseFile(field.Path(), parser.ParseComments)
+		f, err := parser.ParseFile(field.FilePath(), parser.ParseComments)
 		if err != nil {
-			return nil, fmt.Errorf("failed loading AST for %s: %w", field.Path(), err)
+			return nil, fmt.Errorf("failed loading AST for %s: %w", field.FilePath(), err)
 		}
 
-		m[field.Path()] = &analysis.AST{File: f}
+		m[field.FilePath()] = &analysis.AST{File: f}
 	}
 	return m, nil
 }
 
-func compareFieldByFileMetadata(a, b fleetpkg.Field) int {
+func compareFieldByFileMetadata(a, b pkgspec.Field) int {
 	return compareFileMetadata(a.FileMetadata, b.FileMetadata)
 }
 
-func compareFileMetadata(a, b fleetpkg.FileMetadata) int {
-	if c := cmp.Compare(a.Path(), b.Path()); c != 0 {
+func compareFileMetadata(a, b pkgspec.FileMetadata) int {
+	if c := cmp.Compare(a.FilePath(), b.FilePath()); c != 0 {
 		return c
 	}
 	if c := cmp.Compare(a.Line(), b.Line()); c != 0 {
 		return c
 	}
 	return cmp.Compare(a.Column(), b.Column())
+}
+
+// readFields reads all files matching the given globs and returns all fields.
+func readFields(globs ...string) ([]pkgspec.Field, error) {
+	var matches []string
+	for _, glob := range globs {
+		m, err := filepath.Glob(glob)
+		if err != nil {
+			return nil, err
+		}
+		matches = append(matches, m...)
+	}
+
+	var fields []pkgspec.Field
+	for _, file := range matches {
+		ff, err := readFieldsFile(file)
+		if err != nil {
+			return nil, err
+		}
+		fields = append(fields, ff...)
+	}
+	return fields, nil
+}
+
+func readFieldsFile(path string) ([]pkgspec.Field, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var fields []pkgspec.Field
+	if err = yaml.Unmarshal(data, &fields); err != nil {
+		return nil, fmt.Errorf("failed reading from %q: %w", path, err)
+	}
+
+	pkgspec.AnnotateFileMetadata(path, &fields)
+	pkgspec.AnnotateFieldPointers(fields)
+	return fields, nil
 }
 
 func compareAnalyzer(a, b *analysis.Analyzer) int {

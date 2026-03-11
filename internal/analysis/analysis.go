@@ -25,8 +25,9 @@ import (
 	"flag"
 	"io"
 	"strconv"
+	"strings"
 
-	"github.com/andrewkroh/go-fleetpkg"
+	"github.com/andrewkroh/go-package-spec/pkgspec"
 	"github.com/goccy/go-yaml"
 	"github.com/goccy/go-yaml/ast"
 
@@ -50,8 +51,8 @@ type Pass struct {
 	Fix bool // Should the analyzer apply fixes to AST?
 
 	// Field information.
-	Fields []*fleetpkg.Field // Fields from every file.
-	Flat   []*fleetpkg.Field // Flat view of all fields sorted by file and line number.
+	Fields []*pkgspec.Field // Fields from every file.
+	Flat   []*pkgspec.Field // Flat view of all fields sorted by file and line number.
 
 	// Map of file paths to the AST of that file. This is available when Fix is true.
 	// Analyzers may add, modify, and delete map attributes, but they should not
@@ -75,9 +76,9 @@ type Pos struct {
 	Col  int
 }
 
-func NewPos(meta fleetpkg.FileMetadata) Pos {
+func NewPos(meta pkgspec.FileMetadata) Pos {
 	return Pos{
-		File: meta.Path(),
+		File: meta.FilePath(),
 		Line: meta.Line(),
 		Col:  meta.Column(),
 	}
@@ -115,7 +116,7 @@ type Printer func(diags []Diagnostic, w io.Writer)
 
 // VisitFields can be used to iterate over non-flat fields. Use this when you
 // need to analyze attributes of non-leaf fields.
-func VisitFields(fields []*fleetpkg.Field, v func(*fleetpkg.Field) error) error {
+func VisitFields(fields []*pkgspec.Field, v func(*pkgspec.Field) error) error {
 	for i := range fields {
 		if err := visitField(fields[i], v); err != nil {
 			return err
@@ -124,12 +125,12 @@ func VisitFields(fields []*fleetpkg.Field, v func(*fleetpkg.Field) error) error 
 	return nil
 }
 
-func visitField(f *fleetpkg.Field, v func(*fleetpkg.Field) error) error {
+func visitField(f *pkgspec.Field, v func(*pkgspec.Field) error) error {
 	if err := v(f); err != nil {
 		return err
 	}
-	for _, child := range f.Fields {
-		if err := visitField(&child, v); err != nil {
+	for i := range f.Fields {
+		if err := visitField(&f.Fields[i], v); err != nil {
 			return err
 		}
 	}
@@ -138,17 +139,17 @@ func visitField(f *fleetpkg.Field, v func(*fleetpkg.Field) error) error {
 
 // DeleteKey deletes the specified key from the AST associated with the given field.
 // If pass.Fix is false, then this is a no-op.
-func DeleteKey(field *fleetpkg.Field, key string, pass *Pass) (modified bool, err error) {
+func DeleteKey(field *pkgspec.Field, key string, pass *Pass) (modified bool, err error) {
 	if !pass.Fix {
 		return false, nil
 	}
 
-	p, err := yaml.PathString(field.YAMLPath + "." + key)
+	p, err := yaml.PathString(YAMLPath(field) + "." + key)
 	if err != nil {
 		return false, err
 	}
 
-	ast := pass.AST[field.Path()]
+	ast := pass.AST[field.FilePath()]
 
 	if err := yamledit.DeleteNode(ast.File, p); err != nil {
 		if !errors.Is(err, yaml.ErrNotFoundNode) {
@@ -159,4 +160,30 @@ func DeleteKey(field *fleetpkg.Field, key string, pass *Pass) (modified bool, er
 
 	ast.Modified = true
 	return true, nil
+}
+
+// YAMLPath converts a pkgspec.Field's JsonPointer (RFC 6901 format like
+// "/0/fields/1") into a goccy/go-yaml path string ("$[0].fields[1]").
+func YAMLPath(f *pkgspec.Field) string {
+	ptr := f.JsonPointer
+	if ptr == "" {
+		return ""
+	}
+	parts := strings.Split(ptr, "/")
+	var b strings.Builder
+	b.WriteByte('$')
+	for _, p := range parts {
+		if p == "" {
+			continue
+		}
+		if _, err := strconv.Atoi(p); err == nil {
+			b.WriteByte('[')
+			b.WriteString(p)
+			b.WriteByte(']')
+		} else {
+			b.WriteByte('.')
+			b.WriteString(p)
+		}
+	}
+	return b.String()
 }

@@ -1,7 +1,7 @@
-github.com/andrewkroh/go-ecs v0.0.0-20260204044457-2d67483e976a h1:97PBoqqEQzZGvZFwfYm6bLpIgzj55beJXrGq/15F5xo=
-github.com/andrewkroh/go-ecs v0.0.0-20260204044457-2d67483e976a/go.mod h1:MDEnOCgOILh8aBc6rhhUiWPyws1aoNxXw/NY/J5oen8=
-github.com/andrewkroh/go-fleetpkg v0.21.0 h1:1PXkUvJVJkbLcoOnnccdche5Ru5Z+xW0DZJvkn1RIH4=
-github.com/andrewkroh/go-fleetpkg v0.21.0/go.mod h1:FOoPEq03FzRDkmcC6VlpH1leiTLLuec05DWQ3YlIgxM=
+github.com/andrewkroh/go-ecs v0.0.0-20260219195257-9c8305af118d h1:clkLJQu0dND56chdl+dBdKNx3d88S36OrgN2Rk4o3Ro=
+github.com/andrewkroh/go-ecs v0.0.0-20260219195257-9c8305af118d/go.mod h1:pbUM1j+N3QqrRV9PD9QUujTFWGllivUFtAj+jYrsRW4=
+github.com/andrewkroh/go-package-spec v0.0.0-20260311143825-640eca3620f9 h1:xx/PpNkdX7hvihrdBnGoD53nuEWWw9ekUWAw1FLMUxY=
+github.com/andrewkroh/go-package-spec v0.0.0-20260311143825-640eca3620f9/go.mod h1:VYFYfQkXOAe7RIOtSSUNfB6k7bn7An3IKRxfJvTvA8g=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fatih/color v1.18.0 h1:S8gINlzdQ840/4pfAwic/ZE0djQEH3wM94VfqLTZcOM=
@@ -16,11 +16,11 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
-golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b h1:DXr+pvt3nC887026GRP39Ej11UATqWDmWuS99x26cD0=
-golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b/go.mod h1:4QTo5u+SEIbbKW1RacMZq1YEfOBqeXa19JeshGi+zc4=
+golang.org/x/exp v0.0.0-20260218203240-3dfff04db8fa h1:Zt3DZoOFFYkKhDT3v7Lm9FDMEV06GpzjG2jrqW+QTE0=
+golang.org/x/exp v0.0.0-20260218203240-3dfff04db8fa/go.mod h1:K79w1Vqn7PoiZn+TkNpx3BUWUQksGO3JcVX6qIjytmA=
 golang.org/x/sys v0.6.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.36.0 h1:KVRy2GtZBrk1cBYA7MKu5bEZFxQk4NIDV6RLVcC8o0k=
-golang.org/x/sys v0.36.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=
+golang.org/x/sys v0.41.0 h1:Ivj+2Cp/ylzLiEU89QhWblYnOE9zerudt9Ftecq2C6k=
+golang.org/x/sys v0.41.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
