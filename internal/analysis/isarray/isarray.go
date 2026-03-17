@@ -449,7 +449,7 @@ func checkProcessorNodes(file string, seq *yaml.Node, ecsFields map[string]*ecs.
 	}
 }
 
-func checkAppendNode(file string, procTypeKey *yaml.Node, config *yaml.Node, ecsFields map[string]*ecs.Field, arrayFields map[string]bool, pass *analysis.Pass, reported map[string]bool) {
+func checkAppendNode(file string, procTypeKey, config *yaml.Node, ecsFields map[string]*ecs.Field, arrayFields map[string]bool, pass *analysis.Pass, reported map[string]bool) {
 	var fieldName string
 	var fieldLine int
 
