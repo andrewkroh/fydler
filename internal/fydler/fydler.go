@@ -166,6 +166,13 @@ func parseFlags(analyzers []*analysis.Analyzer) {
 		fmt.Fprintln(out, "Version:", version())
 		fmt.Fprintln(out, "")
 
+		fmt.Fprintln(out, "Environment variables for markdown output:")
+		fmt.Fprintln(out, "")
+		fmt.Fprintln(out, "  GITHUB_REPOSITORY  GitHub owner/repo for links (default: elastic/integrations)")
+		fmt.Fprintln(out, "  GITHUB_SHA         Commit SHA for links (default: main)")
+		fmt.Fprintln(out, "  GITHUB_WORKSPACE   Repo root path to trim from file paths in links")
+		fmt.Fprintln(out, "")
+
 		fmt.Fprintln(out, "Flags:")
 		flag.PrintDefaults()
 	}
