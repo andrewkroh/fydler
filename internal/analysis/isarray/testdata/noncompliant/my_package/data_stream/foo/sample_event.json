@@ -1,0 +1,14 @@
+{
+  "event": {
+    "category": "authentication"
+  },
+  "host": {
+    "name": ["host-a", "host-b"]
+  },
+  "related": {
+    "ip": "10.0.0.1"
+  },
+  "source": {
+    "ip": "10.0.0.1"
+  }
+}
