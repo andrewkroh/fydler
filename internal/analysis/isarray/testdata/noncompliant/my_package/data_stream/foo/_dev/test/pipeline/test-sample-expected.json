@@ -1,0 +1,11 @@
+{
+  "expected": [
+    {
+      "event": {
+        "category": "authentication",
+        "type": "info"
+      },
+      "tags": "forwarded"
+    }
+  ]
+}

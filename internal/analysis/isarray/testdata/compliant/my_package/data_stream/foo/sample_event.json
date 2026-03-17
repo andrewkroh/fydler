@@ -1,0 +1,11 @@
+{
+  "event": {
+    "category": ["authentication"]
+  },
+  "related": {
+    "ip": ["10.0.0.1"]
+  },
+  "source": {
+    "ip": "10.0.0.1"
+  }
+}

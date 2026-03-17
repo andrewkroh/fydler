@@ -27,6 +27,7 @@ import (
 	"github.com/andrewkroh/fydler/internal/analysis/ecsnamespace"
 	"github.com/andrewkroh/fydler/internal/analysis/fieldgroup"
 	"github.com/andrewkroh/fydler/internal/analysis/invalidattribute"
+	"github.com/andrewkroh/fydler/internal/analysis/isarray"
 	"github.com/andrewkroh/fydler/internal/analysis/missingtype"
 	"github.com/andrewkroh/fydler/internal/analysis/nesting"
 	"github.com/andrewkroh/fydler/internal/analysis/objectmapping"
@@ -43,6 +44,7 @@ func main() {
 		ecsnamespace.Analyzer,
 		fieldgroup.Analyzer,
 		invalidattribute.Analyzer,
+		isarray.Analyzer,
 		missingtype.Analyzer,
 		nesting.Analyzer,
 		objectmapping.Analyzer,
