@@ -25,6 +25,7 @@ import (
 	"html"
 	"io"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"time"
@@ -102,9 +103,17 @@ func Markdown(diags []analysis.Diagnostic, w io.Writer, analyzers []*analysis.An
 	if commit == "" {
 		commit = "main"
 	}
+	workspace := os.Getenv("GITHUB_WORKSPACE")
+
+	relPath := func(p string) string {
+		if workspace != "" {
+			p, _ = filepath.Rel(workspace, p)
+		}
+		return filepath.ToSlash(p)
+	}
 
 	toURL := func(p analysis.Pos) string {
-		return fmt.Sprintf("https://github.com/%s/blob/%s/%s#L%d", repo, commit, p.File, p.Line)
+		return fmt.Sprintf("https://github.com/%s/blob/%s/%s#L%d", repo, commit, relPath(p.File), p.Line)
 	}
 
 	// Sort diagnostics by category, file, and line.
@@ -126,15 +135,19 @@ func Markdown(diags []analysis.Diagnostic, w io.Writer, analyzers []*analysis.An
 			for _, a := range analyzers {
 				if a.Name == d.Category {
 					fmt.Fprintf(w, "%s\n\n", a.Description)
+					if a.CanFix {
+						fmt.Fprintf(w, "_This finding is automatically fixable via the `-fix` flag._\n\n")
+					}
 					break
 				}
 			}
 		}
 
-		fmt.Fprintf(w, "- [%s:%d](%s) %s\n", d.Pos.File, d.Pos.Line, toURL(d.Pos), escapeMarkdown(d.Message))
+		rel := relPath(d.Pos.File)
+		fmt.Fprintf(w, "- [%s:%d](%s) %s\n", rel, d.Pos.Line, toURL(d.Pos), escapeMarkdown(d.Message))
 
 		for _, r := range d.Related {
-			fmt.Fprintf(w, "  - [%s:%d](%s) %s\n", r.Pos.File, r.Pos.Line, toURL(r.Pos), escapeMarkdown(r.Message))
+			fmt.Fprintf(w, "  - [%s:%d](%s) %s\n", relPath(r.Pos.File), r.Pos.Line, toURL(r.Pos), escapeMarkdown(r.Message))
 		}
 		fmt.Println()
 	}
