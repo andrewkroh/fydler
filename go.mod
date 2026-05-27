@@ -8,7 +8,6 @@ require (
 	github.com/fatih/color v1.19.0
 	github.com/goccy/go-yaml v1.19.2
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/exp v0.0.0-20260218203240-3dfff04db8fa
 	gopkg.in/yaml.v3 v3.0.1
 )
 
