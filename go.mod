@@ -3,7 +3,7 @@ module github.com/andrewkroh/fydler
 go 1.26.0
 
 require (
-	github.com/andrewkroh/go-ecs v0.0.0-20260219195257-9c8305af118d
+	github.com/andrewkroh/go-ecs v0.0.0-20260521120750-bebea6c0517a
 	github.com/andrewkroh/go-package-spec v0.0.0-20260311143825-640eca3620f9
 	github.com/fatih/color v1.19.0
 	github.com/goccy/go-yaml v1.19.2
