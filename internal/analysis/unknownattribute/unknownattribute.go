@@ -20,10 +20,10 @@ package unknownattribute
 
 import (
 	"fmt"
+	"maps"
 	"slices"
 
 	"github.com/andrewkroh/go-package-spec/pkgspec"
-	"golang.org/x/exp/maps"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
 )
@@ -38,7 +38,7 @@ var Analyzer = &analysis.Analyzer{
 func run(pass *analysis.Pass) (interface{}, error) {
 	return nil, analysis.VisitFields(pass.Fields, func(f *pkgspec.Field) error {
 		// Determinism
-		attrs := maps.Keys(f.Extras)
+		attrs := slices.Collect(maps.Keys(f.Extras))
 		slices.Sort(attrs)
 
 		for _, attrName := range attrs {

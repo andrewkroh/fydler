@@ -23,7 +23,6 @@ import (
 	"path/filepath"
 
 	"github.com/andrewkroh/go-package-spec/pkgspec"
-	"golang.org/x/exp/maps"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
 )
@@ -66,7 +65,9 @@ func run(pass *analysis.Pass) (any, error) {
 		if dir := filepath.Dir(f.FilePath()); currentDir != dir {
 			// Reset
 			flush()
-			maps.Clear(seen)
+			for k := range seen {
+				delete(seen, k)
+			}
 			currentDir = dir
 		}
 

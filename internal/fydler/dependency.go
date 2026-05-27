@@ -18,7 +18,8 @@
 package fydler
 
 import (
-	"golang.org/x/exp/maps"
+	"maps"
+	"slices"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
 	"github.com/andrewkroh/fydler/internal/graph"
@@ -57,7 +58,7 @@ func buildGraph(analyzers []*analysis.Analyzer) *graph.Graph {
 		nodeSet[e.To.ID()] = e.To
 	}
 
-	return graph.New(maps.Values(nodeSet), maps.Keys(edges))
+	return graph.New(slices.Collect(maps.Values(nodeSet)), slices.Collect(maps.Keys(edges)))
 }
 
 // allEdges recursively follows the required analyzers of n to build

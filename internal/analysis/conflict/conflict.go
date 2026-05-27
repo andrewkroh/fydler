@@ -24,12 +24,12 @@ import (
 	"cmp"
 	"errors"
 	"fmt"
+	"maps"
 	"slices"
 	"strings"
 
 	"github.com/andrewkroh/go-ecs"
 	"github.com/andrewkroh/go-package-spec/pkgspec"
-	"golang.org/x/exp/maps"
 
 	"github.com/andrewkroh/fydler/internal/analysis"
 	"github.com/andrewkroh/fydler/internal/analysis/aliasfact"
@@ -113,14 +113,16 @@ func nonExternalConflicts(pass *analysis.Pass) error {
 			dataTypes[string(f.Type)] = struct{}{}
 		}
 		if len(dataTypes) > 1 {
-			if diag := makeDiag(fields, maps.Keys(dataTypes)); diag != nil {
+			if diag := makeDiag(fields, slices.Collect(maps.Keys(dataTypes))); diag != nil {
 				pass.Report(*diag)
 			}
 		}
 
 		// Reset
 		fields = fields[:0]
-		maps.Clear(dataTypes)
+		for k := range dataTypes {
+			delete(dataTypes, k)
+		}
 	}
 
 	for _, f := range aliasFact.ResolvedAliases {
