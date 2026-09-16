@@ -99,7 +99,8 @@ func appendMapNode(f *ast.File, p *yaml.Path, key string, value any) error {
 		n = ast.Mapping(
 			token.New(":", ":", n.GetToken().Position),
 			false,
-			v)
+			v,
+		)
 	}
 
 	switch n := n.(type) {
